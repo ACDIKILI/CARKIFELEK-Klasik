@@ -3,53 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Feleğin Çarkı - V5.1 Tamir</title>
+    <title>ÇARKIFELEK-Klasik</title>
     <style>
         body { margin: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Arial Black', sans-serif; color: white; }
-        .phone-frame { width: 360px; height: 640px; background-color: #121212; border: 8px solid #222; border-radius: 40px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20px; }
+        .phone-frame { width: 360px; height: 640px; background-color: #121212; border: 8px solid #222; border-radius: 40px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15px; }
 
-        .top-menu { width: 335px; display: flex; flex-direction: column; gap: 10px; z-index: 300; }
-        .row { display: flex; gap: 8px; align-items: stretch; justify-content: space-between; }
+        /* Başlık */
+        .game-title { font-size: 20px; color: #fbc02d; margin-bottom: 10px; text-shadow: 0 0 10px rgba(251, 192, 45, 0.5); }
+
+        .top-menu { width: 335px; display: flex; flex-direction: column; gap: 8px; z-index: 300; }
+        .row { display: flex; gap: 5px; align-items: stretch; justify-content: space-between; }
         
         .header-box { background-color: #fbc02d; border: 2px solid #000; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #000; }
-        .mini-board { width: 75px; height: 55px; }
-        .mod-box { flex: 1; height: 55px; background-color: #1a1a1a; color: #fff; border: 1px solid #333; }
+        .mini-board { width: 75px; height: 50px; }
+        .mod-box { flex: 1; height: 50px; background-color: #1a1a1a; color: #fff; border: 1px solid #333; }
         
-        .box-label { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
-        .box-val { font-size: 20px; font-weight: 900; }
+        .box-label { font-size: 10px; font-weight: 900; margin-bottom: 1px; }
+        .box-val { font-size: 18px; font-weight: 900; }
 
-        .mod-title { font-size: 13px; font-weight: 900; color: #fbc02d; margin-bottom: 4px; }
-        .btn-opt { background: #333; border: 1px solid #fbc02d; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-        .btn-opt.active { background: #fbc02d; color: #000; box-shadow: 0 0 10px #fbc02d; }
+        .mod-title { font-size: 12px; font-weight: 900; color: #fbc02d; margin-bottom: 3px; }
+        .btn-opt { background: #333; border: 1px solid #fbc02d; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
+        .btn-opt.active { background: #fbc02d; color: #000; box-shadow: 0 0 8px #fbc02d; }
 
-        .selector-row { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
-        .tur-box { flex: 1; background-color: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; }
-        .oyuncu-box { flex: 1.2; background-color: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; }
+        .selector-row { display: flex; gap: 6px; width: 100%; margin-top: 3px; }
+        .tur-box, .oyuncu-box { flex: 1; background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 5px; display: flex; flex-direction: column; align-items: center; }
 
-        .cnt-btn { background: #fff; color: #000; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .cnt-val { font-size: 16px; color: #fff; min-width: 25px; text-align: center; }
+        .cnt-btn { background: #fff; color: #000; border: none; width: 20px; height: 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .cnt-val { font-size: 14px; color: #fff; min-width: 20px; text-align: center; }
 
-        #status-bar { width: 100%; text-align: center; color: #fbc02d; font-size: 13px; margin-top: 10px; text-shadow: 1px 1px 2px #000; }
+        #status-bar { width: 100%; text-align: center; color: #fbc02d; font-size: 12px; margin-top: 8px; text-shadow: 1px 1px 2px #000; }
 
-        .wheel-container { position: relative; width: 310px; height: 310px; margin-top: 35px; }
+        /* Çark Alanı */
+        .wheel-container { position: relative; width: 300px; height: 300px; margin-top: 25px; }
         #wheel-canvas { width: 100%; height: 100%; border: 8px solid #ff0000; border-radius: 50%; box-sizing: border-box; }
-        .pointer-wrapper { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); z-index: 100; transform-origin: top center; }
-        .pointer { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 45px solid #fbc02d; filter: drop-shadow(0 4px 6px #000); }
-        #spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 75px; height: 75px; background: #fbc02d; border: 6px solid #ff0000; border-radius: 50%; color: #000; font-weight: 900; font-size: 16px; cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center; }
+        .pointer-wrapper { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); z-index: 100; transform-origin: top center; }
+        .pointer { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 40px solid #fbc02d; filter: drop-shadow(0 4px 6px #000); }
+        #spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: #fbc02d; border: 5px solid #ff0000; border-radius: 50%; color: #000; font-weight: 900; font-size: 14px; cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center; }
 
-        .gold-btn { position: absolute; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: radial-gradient(circle, #fff2cc, #ffd700, #b8860b); border: 3px solid #fff; border-radius: 12px; color: #000; text-align: center; box-shadow: 0 0 20px #ffd700; z-index: 250; display: none; cursor: pointer; }
-        #result-popup { top: 72%; font-size: 20px; pointer-events: none; }
-        #next-player-btn { top: 82%; font-size: 14px; width: 240px; animation: pulse 1.5s infinite; }
+        /* Dünya Skoru Butonu */
+        .world-score-btn { margin-top: 15px; width: 200px; padding: 8px; background: #1a1a1a; border: 1px solid #fbc02d; color: #fbc02d; border-radius: 10px; font-size: 12px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .world-score-btn:hover { background: #fbc02d; color: #000; }
+
+        /* Popuplar */
+        .gold-btn { position: absolute; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: radial-gradient(circle, #fff2cc, #ffd700, #b8860b); border: 3px solid #fff; border-radius: 12px; color: #000; text-align: center; box-shadow: 0 0 20px #ffd700; z-index: 250; display: none; }
+        #result-popup { top: 70%; font-size: 18px; pointer-events: none; }
+        #next-player-btn { top: 80%; font-size: 12px; width: 220px; cursor: pointer; animation: pulse 1.5s infinite; }
+
+        /* Final & Dünya Skoru Ekranı */
+        #final-screen, #world-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; border-radius: 40px; }
+        .table-row { display: flex; justify-content: space-between; width: 85%; border-bottom: 1px solid #fbc02d; padding: 8px; font-size: 16px; }
+        .close-btn { margin-top: 20px; background: #fbc02d; color: #000; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
         @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
-
-        #final-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .table-row { display: flex; justify-content: space-between; width: 85%; border-bottom: 1px solid #fbc02d; padding: 10px; font-size: 18px; }
     </style>
 </head>
 <body>
 
 <div class="phone-frame">
+    <div class="game-title">ÇARKIFELEK-Klasik</div>
+
     <div class="top-menu">
         <div class="row">
             <div class="header-box mini-board">
@@ -71,7 +83,7 @@
         
         <div class="selector-row">
             <div class="oyuncu-box" id="p-select-box" style="visibility: hidden;">
-                <span class="mod-title" style="font-size: 11px;">OYUNCU Sayısı</span>
+                <span class="mod-title" style="font-size: 10px;">OYUNCU Sayısı</span>
                 <div class="row" style="justify-content: center; gap: 3px; margin-top: 2px;">
                     <div class="btn-opt p-cnt" onclick="setPlayerCount(1)">1</div>
                     <div class="btn-opt p-cnt" onclick="setPlayerCount(2)">2</div>
@@ -81,8 +93,8 @@
                 </div>
             </div>
             <div class="tur-box">
-                <span class="mod-title" style="font-size: 11px;">TUR Sayısı</span>
-                <div class="row" style="justify-content: center; gap: 10px; margin-top: 2px;">
+                <span class="mod-title" style="font-size: 10px;">TUR Sayısı</span>
+                <div class="row" style="justify-content: center; gap: 8px; margin-top: 2px;">
                     <button class="cnt-btn" onclick="changeTur(-1)">-</button>
                     <span class="cnt-val" id="tur-display">1</span>
                     <button class="cnt-btn" onclick="changeTur(1)">+</button>
@@ -101,10 +113,18 @@
         <div id="next-player-btn" class="gold-btn">SIRADAKİ OYUNCU</div>
     </div>
 
+    <div class="world-score-btn" onclick="showWorldScore()">DÜNYA SKORU</div>
+
     <div id="final-screen">
         <h1 style="color:#fbc02d">OYUN BİTTİ</h1>
         <div id="final-stats" style="width:100%"></div>
-        <button class="cnt-btn" style="width:150px; height:40px; margin-top:20px; font-size: 14px;" onclick="resetGame()">YENİ OYUN</button>
+        <button class="close-btn" onclick="resetGame()">YENİ OYUN</button>
+    </div>
+
+    <div id="world-screen">
+        <h2 style="color:#fbc02d">TOP 5 & SKORUN</h2>
+        <div id="world-stats" style="width:100%"></div>
+        <button class="close-btn" onclick="document.getElementById('world-screen').style.display='none'">KAPAT</button>
     </div>
 </div>
 
@@ -116,7 +136,6 @@
     const nextBtn = document.getElementById('next-player-btn');
     const statusBar = document.getElementById('status-bar');
     const turDisplay = document.getElementById('tur-display');
-    const finalScreen = document.getElementById('final-screen');
 
     let gameMode = 'single';
     let maxTur = 1;
@@ -126,6 +145,9 @@
     let playerScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     let spinning = false;
     let items = ["İFLAS", "PAS", "PAS", "1", "10", "50", "100", "200", "350", "500", "1000", "5000"];
+
+    // Dünya Skoru Kaydı (LocalStorage)
+    let worldTotal = parseInt(localStorage.getItem('wheelWorldScore')) || 0;
 
     function changeTur(val) {
         if(spinning) return;
@@ -150,12 +172,27 @@
         resetGame();
     }
 
+    function showWorldScore() {
+        const screen = document.getElementById('world-screen');
+        const stats = document.getElementById('world-stats');
+        stats.innerHTML = `
+            <div class="table-row" style="color:#fbc02d"><span>SENİN SKORUN:</span><span>${worldTotal}</span></div>
+            <div style="height:10px"></div>
+            <div class="table-row"><span>1. King_Wheel</span><span>950.000</span></div>
+            <div class="table-row"><span>2. Master_Spin</span><span>720.500</span></div>
+            <div class="table-row"><span>3. LuckyDay</span><span>500.000</span></div>
+            <div class="table-row"><span>4. ProPlayer</span><span>310.000</span></div>
+            <div class="table-row"><span>5. Star_77</span><span>150.000</span></div>
+        `;
+        screen.style.display = 'flex';
+    }
+
     function resetGame() {
         currentPlayer = 1; currentSpins = 0;
         playerScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         document.getElementById('tot-val').innerText = '0';
         document.getElementById('cur-val').innerText = '0';
-        finalScreen.style.display = 'none';
+        document.getElementById('final-screen').style.display = 'none';
         nextBtn.style.display = 'none';
         updateStatus();
         draw();
@@ -189,19 +226,11 @@
             else if (parseInt(text) < 1000) ctx.fillStyle = "#2E7D32";
             else if (text === "1000") ctx.fillStyle = "#1565C0";
             else ctx.fillStyle = "#C62828";
-            
             ctx.moveTo(r, r); ctx.arc(r, r, r, angle, angle + arc); ctx.fill();
             ctx.strokeStyle = "#000"; ctx.lineWidth = 4; ctx.stroke();
-            
-            ctx.save();
-            ctx.translate(r, r);
-            ctx.rotate(angle);
-            ctx.beginPath();
-            ctx.arc(r - 5, 0, 6, 0, Math.PI * 2);
-            ctx.fillStyle = "#000";
-            ctx.fill();
+            ctx.save(); ctx.translate(r, r); ctx.rotate(angle);
+            ctx.beginPath(); ctx.arc(r - 5, 0, 6, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill();
             ctx.restore();
-
             ctx.save(); ctx.translate(r, r); ctx.rotate(angle + arc / 2);
             ctx.textAlign = "right"; ctx.fillStyle = (text==="İFLAS"||text==="PAS"||parseInt(text)>=100) ? "#fff":"#000";
             ctx.font = "bold 30px Arial"; ctx.fillText(text, r - 45, 10); ctx.restore();
@@ -218,8 +247,6 @@
             updateStatus();
             return;
         }
-        if (currentSpins >= maxTur && gameMode === 'single') return; // Bireysel tur bittiyse basma
-
         spinning = true;
         resultPopup.style.display = "none";
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -274,11 +301,22 @@
                 }, 1500);
             } else { 
                 setTimeout(() => { 
-                    finalScreen.style.display = "flex"; 
+                    // Tur bitiminde Dünya Skoru'na ekleme yap
+                    if(gameMode === 'single') {
+                        worldTotal += playerScores[1];
+                        localStorage.setItem('wheelWorldScore', worldTotal);
+                    } else {
+                        // Çoklu modda tüm oyuncuların toplamını ekle (İsteğe göre değişebilir)
+                        for(let i=1; i<=playerCount; i++) worldTotal += playerScores[i];
+                        localStorage.setItem('wheelWorldScore', worldTotal);
+                    }
+
+                    document.getElementById('final-screen').style.display = "flex"; 
                     let s=""; 
                     for(let i=1; i<=(gameMode==='single'?1:playerCount); i++) {
                         s+=`<div class='table-row'><span>Oyuncu ${i}:</span><span>${playerScores[i]} Puan</span></div>`;
                     }
+                    s += `<div style="height:10px"></div><div class='table-row' style='color:#fbc02d'><span>DÜNYA SKORUNA EKLENDİ!</span></div>`;
                     document.getElementById('final-stats').innerHTML=s; 
                 }, 1500); 
             }
