@@ -3,36 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Feleğin Çarkı - ARA KUTSAL KOD</title>
+    <title>Feleğin Çarkı - V5.1 Tamir</title>
     <style>
         body { margin: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Arial Black', sans-serif; color: white; }
-        .phone-frame { width: 360px; height: 640px; background-color: #121212; border: 8px solid #222; border-radius: 40px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .phone-frame { width: 360px; height: 640px; background-color: #121212; border: 8px solid #222; border-radius: 40px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20px; }
 
-        /* Üst Menü ve Seçenekler */
-        .top-menu { position: absolute; top: 15px; left: 15px; width: 330px; display: flex; flex-direction: column; gap: 8px; z-index: 300; }
-        .row { display: flex; gap: 5px; align-items: center; }
-        .mini-board { background-color: #fbc02d; border: 2px solid #000; border-radius: 6px; padding: 4px; min-width: 70px; text-align: center; color: #000; }
-        .btn-opt { background: #333; border: 1px solid #fbc02d; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-        .btn-opt.active { background: #fbc02d; color: #000; box-shadow: 0 0 10px #fbc02d; }
+        .top-menu { width: 335px; display: flex; flex-direction: column; gap: 10px; z-index: 300; }
+        .row { display: flex; gap: 8px; align-items: stretch; justify-content: space-between; }
         
-        /* Çark ve Mekanikler */
-        .wheel-container { position: relative; width: 310px; height: 310px; margin-top: 50px; }
+        .header-box { background-color: #fbc02d; border: 2px solid #000; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #000; }
+        .mini-board { width: 75px; height: 55px; }
+        .mod-box { flex: 1; height: 55px; background-color: #1a1a1a; color: #fff; border: 1px solid #333; }
+        
+        .box-label { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+        .box-val { font-size: 20px; font-weight: 900; }
+
+        .mod-title { font-size: 13px; font-weight: 900; color: #fbc02d; margin-bottom: 4px; }
+        .btn-opt { background: #333; border: 1px solid #fbc02d; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+        .btn-opt.active { background: #fbc02d; color: #000; box-shadow: 0 0 10px #fbc02d; }
+
+        .selector-row { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
+        .tur-box { flex: 1; background-color: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; }
+        .oyuncu-box { flex: 1.2; background-color: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; }
+
+        .cnt-btn { background: #fff; color: #000; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .cnt-val { font-size: 16px; color: #fff; min-width: 25px; text-align: center; }
+
+        #status-bar { width: 100%; text-align: center; color: #fbc02d; font-size: 13px; margin-top: 10px; text-shadow: 1px 1px 2px #000; }
+
+        .wheel-container { position: relative; width: 310px; height: 310px; margin-top: 35px; }
         #wheel-canvas { width: 100%; height: 100%; border: 8px solid #ff0000; border-radius: 50%; box-sizing: border-box; }
         .pointer-wrapper { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); z-index: 100; transform-origin: top center; }
         .pointer { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 45px solid #fbc02d; filter: drop-shadow(0 4px 6px #000); }
         #spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 75px; height: 75px; background: #fbc02d; border: 6px solid #ff0000; border-radius: 50%; color: #000; font-weight: 900; font-size: 16px; cursor: pointer; z-index: 200; display: flex; align-items: center; justify-content: center; }
 
-        /* Bilgi Ekranları */
-        #status-bar { position: absolute; top: 110px; width: 100%; text-align: center; color: #fbc02d; font-size: 14px; text-shadow: 1px 1px 2px #000; }
-        #result-popup { position: absolute; top: 72%; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: radial-gradient(circle, #fff2cc, #ffd700, #b8860b); border: 3px solid #fff; border-radius: 12px; color: #000; font-size: 20px; box-shadow: 0 0 20px #ffd700; z-index: 250; display: none; }
-        
-        /* Final Tablosu */
-        #final-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .table-row { display: flex; justify-content: space-between; width: 80%; border-bottom: 1px solid #fbc02d; padding: 10px; font-size: 18px; }
-        .btn-restart { margin-top: 30px; background: #fbc02d; color: #000; padding: 15px 30px; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
+        .gold-btn { position: absolute; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: radial-gradient(circle, #fff2cc, #ffd700, #b8860b); border: 3px solid #fff; border-radius: 12px; color: #000; text-align: center; box-shadow: 0 0 20px #ffd700; z-index: 250; display: none; cursor: pointer; }
+        #result-popup { top: 72%; font-size: 20px; pointer-events: none; }
+        #next-player-btn { top: 82%; font-size: 14px; width: 240px; animation: pulse 1.5s infinite; }
 
-        /* İmza */
-        .signature { position: absolute; bottom: 15px; font-size: 10px; color: #555; letter-spacing: 2px; }
+        @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
+        #final-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .table-row { display: flex; justify-content: space-between; width: 85%; border-bottom: 1px solid #fbc02d; padding: 10px; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -40,22 +52,42 @@
 <div class="phone-frame">
     <div class="top-menu">
         <div class="row">
-            <div class="mini-board" style="width: 60px;"><span style="font-size:8px">SKOR</span><div id="cur-val">0</div></div>
-            <div class="mini-board" style="width: 70px;"><span style="font-size:8px">TOPLAM</span><div id="tot-val">0</div></div>
-            <div class="mini-board" style="flex:1; background: #1a1a1a; color:#fff;"><span style="font-size:8px">MOD</span>
-                <div class="row" style="justify-content: center; margin-top:2px;">
+            <div class="header-box mini-board">
+                <span class="box-label">SKOR</span>
+                <div id="cur-val" class="box-val">0</div>
+            </div>
+            <div class="header-box mini-board">
+                <span class="box-label">TOPLAM</span>
+                <div id="tot-val" class="box-val">0</div>
+            </div>
+            <div class="mod-box header-box">
+                <span class="mod-title">MOD</span>
+                <div class="row" style="justify-content: center; gap: 5px;">
                     <div id="opt-single" class="btn-opt active" onclick="setMode('single')">Bireysel</div>
                     <div id="opt-multi" class="btn-opt" onclick="setMode('multi')">Çoklu</div>
                 </div>
             </div>
         </div>
-        <div id="player-select" class="row" style="display:none; justify-content: flex-end;">
-            <span style="font-size:10px; color:#fbc02d;">Oyuncu:</span>
-            <div class="btn-opt" onclick="setPlayers(1)">1</div>
-            <div class="btn-opt" onclick="setPlayers(2)">2</div>
-            <div class="btn-opt" onclick="setPlayers(3)">3</div>
-            <div class="btn-opt" onclick="setPlayers(4)">4</div>
-            <div class="btn-opt" onclick="setPlayers(5)">5</div>
+        
+        <div class="selector-row">
+            <div class="oyuncu-box" id="p-select-box" style="visibility: hidden;">
+                <span class="mod-title" style="font-size: 11px;">OYUNCU Sayısı</span>
+                <div class="row" style="justify-content: center; gap: 3px; margin-top: 2px;">
+                    <div class="btn-opt p-cnt" onclick="setPlayerCount(1)">1</div>
+                    <div class="btn-opt p-cnt" onclick="setPlayerCount(2)">2</div>
+                    <div class="btn-opt p-cnt" onclick="setPlayerCount(3)">3</div>
+                    <div class="btn-opt p-cnt" onclick="setPlayerCount(4)">4</div>
+                    <div class="btn-opt p-cnt" onclick="setPlayerCount(5)">5</div>
+                </div>
+            </div>
+            <div class="tur-box">
+                <span class="mod-title" style="font-size: 11px;">TUR Sayısı</span>
+                <div class="row" style="justify-content: center; gap: 10px; margin-top: 2px;">
+                    <button class="cnt-btn" onclick="changeTur(-1)">-</button>
+                    <span class="cnt-val" id="tur-display">1</span>
+                    <button class="cnt-btn" onclick="changeTur(1)">+</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -65,16 +97,15 @@
         <div class="pointer-wrapper" id="pointer-ui"><div class="pointer"></div></div>
         <canvas id="wheel-canvas"></canvas>
         <div id="spin-btn">BAS</div>
-        <div id="result-popup"></div>
+        <div id="result-popup" class="gold-btn"></div>
+        <div id="next-player-btn" class="gold-btn">SIRADAKİ OYUNCU</div>
     </div>
 
     <div id="final-screen">
         <h1 style="color:#fbc02d">OYUN BİTTİ</h1>
         <div id="final-stats" style="width:100%"></div>
-        <button class="btn-restart" onclick="resetGame()">YENİ OYUN</button>
+        <button class="cnt-btn" style="width:150px; height:40px; margin-top:20px; font-size: 14px;" onclick="resetGame()">YENİ OYUN</button>
     </div>
-
-    <div class="signature">ARA KUTSAL KOD</div>
 </div>
 
 <script>
@@ -82,11 +113,13 @@
     const ctx = canvas.getContext('2d');
     const btn = document.getElementById('spin-btn');
     const resultPopup = document.getElementById('result-popup');
+    const nextBtn = document.getElementById('next-player-btn');
     const statusBar = document.getElementById('status-bar');
+    const turDisplay = document.getElementById('tur-display');
     const finalScreen = document.getElementById('final-screen');
-    const finalStats = document.getElementById('final-stats');
 
     let gameMode = 'single';
+    let maxTur = 1;
     let playerCount = 1;
     let currentPlayer = 1;
     let currentSpins = 0;
@@ -94,21 +127,26 @@
     let spinning = false;
     let items = ["İFLAS", "PAS", "PAS", "1", "10", "50", "100", "200", "350", "500", "1000", "5000"];
 
+    function changeTur(val) {
+        if(spinning) return;
+        maxTur = Math.max(1, Math.min(10, maxTur + val));
+        turDisplay.innerText = maxTur;
+        resetGame();
+    }
+
     function setMode(m) {
         if(spinning) return;
         gameMode = m;
         document.getElementById('opt-single').classList.toggle('active', m==='single');
         document.getElementById('opt-multi').classList.toggle('active', m==='multi');
-        document.getElementById('player-select').style.display = m==='multi' ? 'flex' : 'none';
+        document.getElementById('p-select-box').style.visibility = m==='multi' ? 'visible' : 'hidden';
         resetGame();
     }
 
-    function setPlayers(n) {
+    function setPlayerCount(n) {
         if(spinning) return;
         playerCount = n;
-        document.querySelectorAll('#player-select .btn-opt').forEach((b, i) => {
-            b.classList.toggle('active', (i+1) === n);
-        });
+        document.querySelectorAll('.p-cnt').forEach((b, i) => b.classList.toggle('active', (i+1) === n));
         resetGame();
     }
 
@@ -118,19 +156,26 @@
         document.getElementById('tot-val').innerText = '0';
         document.getElementById('cur-val').innerText = '0';
         finalScreen.style.display = 'none';
+        nextBtn.style.display = 'none';
         updateStatus();
         draw();
     }
 
     function updateStatus() {
-        if(gameMode === 'single') statusBar.innerText = "Bireysel Mod: Sınırsız Hak";
-        else statusBar.innerText = `Oyuncu ${currentPlayer} | Hak: ${10 - currentSpins}/10`;
+        if(gameMode === 'single') statusBar.innerText = `Bireysel Mod | Hak: ${maxTur - currentSpins}/${maxTur}`;
+        else statusBar.innerText = `Oyuncu ${currentPlayer} | Hak: ${maxTur - currentSpins}/${maxTur}`;
     }
 
-    // --- Ses ve Çizim Fonksiyonları (Önceki versiyonla aynı mantık) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playTick() { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.frequency.setValueAtTime(1200, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.04); }
-    function playWhirr(p) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(80 + (p * 200), audioCtx.currentTime); gain.gain.setValueAtTime(0.01, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.08); }
+    function playTick() { 
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); 
+        const gain = audioCtx.createGain(); 
+        osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); 
+        osc.connect(gain); gain.connect(audioCtx.destination); 
+        osc.start(); osc.stop(audioCtx.currentTime + 0.04); 
+    }
 
     function draw() {
         const r = 250; canvas.width = 500; canvas.height = 500;
@@ -148,8 +193,13 @@
             ctx.moveTo(r, r); ctx.arc(r, r, r, angle, angle + arc); ctx.fill();
             ctx.strokeStyle = "#000"; ctx.lineWidth = 4; ctx.stroke();
             
-            ctx.save(); ctx.translate(r, r); ctx.rotate(angle);
-            ctx.beginPath(); ctx.arc(r - 15, 0, 6, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill();
+            ctx.save();
+            ctx.translate(r, r);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.arc(r - 5, 0, 6, 0, Math.PI * 2);
+            ctx.fillStyle = "#000";
+            ctx.fill();
             ctx.restore();
 
             ctx.save(); ctx.translate(r, r); ctx.rotate(angle + arc / 2);
@@ -161,6 +211,15 @@
     let currentRotation = 0;
     btn.addEventListener('click', () => {
         if (spinning) return;
+        if(nextBtn.style.display === 'block') {
+            nextBtn.style.display = 'none';
+            currentSpins = 0;
+            document.getElementById('cur-val').innerText = '0';
+            updateStatus();
+            return;
+        }
+        if (currentSpins >= maxTur && gameMode === 'single') return; // Bireysel tur bittiyse basma
+
         spinning = true;
         resultPopup.style.display = "none";
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -179,23 +238,17 @@
             const currentAngle = currentRotation + (extraSpins * easing);
             canvas.style.transform = `rotate(${currentAngle % 360}deg)`;
 
-            if (progress < 0.5) { if (Math.floor(elapsed / 80) !== Math.floor((elapsed - 16) / 80)) playWhirr(progress); }
-            else {
-                if (Math.abs(currentAngle - lastTickAngle) >= (360/items.length)) {
-                    playTick(); lastTickAngle = currentAngle;
-                    document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(-15deg)";
-                    setTimeout(() => document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(0deg)", 50);
-                }
+            if (progress > 0.5 && Math.abs(currentAngle - lastTickAngle) >= (360/items.length)) {
+                playTick(); lastTickAngle = currentAngle;
+                document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(-15deg)";
+                setTimeout(() => document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(0deg)", 50);
             }
-
             if (progress < 1) requestAnimationFrame(animate);
-            else {
-                spinning = false;
-                currentRotation = currentAngle;
-                const idx = Math.floor((360 - (currentAngle % 360) + 270) % 360 / (360 / items.length));
-                const res = items[idx % items.length];
-                
-                handleResult(res);
+            else { 
+                spinning = false; 
+                currentRotation = currentAngle; 
+                const finalIdx = Math.floor((360 - (currentAngle % 360) + 270) % 360 / (360 / items.length));
+                handleResult(items[finalIdx % items.length]); 
             }
         }
         requestAnimationFrame(animate);
@@ -204,40 +257,36 @@
     function handleResult(res) {
         if (res === "İFLAS") playerScores[currentPlayer] = 0;
         else if (res !== "PAS") playerScores[currentPlayer] += parseInt(res);
-
+        
         document.getElementById('cur-val').innerText = res;
         document.getElementById('tot-val').innerText = playerScores[currentPlayer];
-        resultPopup.innerText = res;
+        resultPopup.innerText = res; 
         resultPopup.style.display = "block";
-
-        if (gameMode === 'multi') {
-            currentSpins++;
-            if (currentSpins >= 10) {
-                if (currentPlayer < playerCount) {
-                    setTimeout(() => {
-                        alert(`Oyuncu ${currentPlayer} bitti! Sıra Oyuncu ${++currentPlayer}'de.`);
-                        currentSpins = 0;
-                        document.getElementById('tot-val').innerText = '0';
-                        updateStatus();
-                    }, 1500);
-                } else {
-                    showFinalTable();
-                }
+        
+        currentSpins++;
+        
+        if (currentSpins >= maxTur) {
+            if (gameMode === 'multi' && currentPlayer < playerCount) {
+                setTimeout(() => { 
+                    nextBtn.innerText = `Sıradaki: Oyuncu ${currentPlayer + 1} (BAS'a Bas)`; 
+                    nextBtn.style.display = 'block'; 
+                    currentPlayer++; 
+                }, 1500);
+            } else { 
+                setTimeout(() => { 
+                    finalScreen.style.display = "flex"; 
+                    let s=""; 
+                    for(let i=1; i<=(gameMode==='single'?1:playerCount); i++) {
+                        s+=`<div class='table-row'><span>Oyuncu ${i}:</span><span>${playerScores[i]} Puan</span></div>`;
+                    }
+                    document.getElementById('final-stats').innerHTML=s; 
+                }, 1500); 
             }
         }
         updateStatus();
     }
 
-    function showFinalTable() {
-        finalStats.innerHTML = "";
-        for (let i = 1; i <= playerCount; i++) {
-            finalStats.innerHTML += `<div class="table-row"><span>Oyuncu ${i}</span><span>${playerScores[i]} Puan</span></div>`;
-        }
-        finalScreen.style.display = "flex";
-    }
-
-    draw();
-    updateStatus();
+    draw(); updateStatus();
 </script>
 </body>
 </html>
