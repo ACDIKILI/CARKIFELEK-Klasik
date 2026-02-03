@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ÇARKIFELEK-Klasik</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { margin: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Arial Black', sans-serif; color: white; }
         .phone-frame { width: 360px; height: 640px; background-color: #121212; border: 8px solid #222; border-radius: 40px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15px; }
+
+        /* Giriş Ekranı */
+        #login-screen { position: absolute; inset: 0; background: #121212; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 32px; }
+        .login-input { background: #1a1a1a; border: 2px solid #fbc02d; color: #fff; padding: 12px; border-radius: 10px; width: 220px; text-align: center; font-size: 18px; margin-bottom: 20px; text-transform: uppercase; }
+        .start-btn { background: #fbc02d; color: #000; padding: 15px 40px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 16px; }
 
         /* Başlık */
         .game-title { font-size: 20px; color: #fbc02d; margin-bottom: 10px; text-shadow: 0 0 10px rgba(251, 192, 45, 0.5); }
@@ -51,7 +58,7 @@
 
         /* Final & Dünya Skoru Ekranı */
         #final-screen, #world-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; border-radius: 40px; }
-        .table-row { display: flex; justify-content: space-between; width: 85%; border-bottom: 1px solid #fbc02d; padding: 8px; font-size: 16px; }
+        .table-row { display: flex; justify-content: space-between; width: 85%; border-bottom: 1px solid #fbc02d; padding: 8px; font-size: 14px; }
         .close-btn { margin-top: 20px; background: #fbc02d; color: #000; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
         @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
@@ -60,6 +67,12 @@
 <body>
 
 <div class="phone-frame">
+    <div id="login-screen">
+        <h2 style="color:#fbc02d; margin-bottom:30px;">HOŞGELDİNİZ</h2>
+        <input type="text" id="player-name-input" class="login-input" placeholder="ADINIZI YAZIN" maxlength="12">
+        <button class="start-btn" onclick="startGame()">OYUNA BAŞLA</button>
+    </div>
+
     <div class="game-title">ÇARKIFELEK-Klasik</div>
 
     <div class="top-menu">
@@ -122,13 +135,26 @@
     </div>
 
     <div id="world-screen">
-        <h2 style="color:#fbc02d">TOP 5 & SKORUN</h2>
+        <h2 style="color:#fbc02d">TOP 5 DÜNYA</h2>
         <div id="world-stats" style="width:100%"></div>
         <button class="close-btn" onclick="document.getElementById('world-screen').style.display='none'">KAPAT</button>
     </div>
 </div>
 
 <script>
+    // FIREBASE YAPILANDIRMASI (BlackJACK 4x4 ile aynı)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBbtvGBl8m1x8thDlsUUutvujedIBCC4PA",
+        authDomain: "blackjack-4x4.firebaseapp.com",
+        databaseURL: "https://blackjack-4x4-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "blackjack-4x4",
+        storageBucket: "blackjack-4x4.appspot.com",
+        messagingSenderId: "805180924640",
+        appId: "1:805180924640:web:c7da5f8c037b7ff5c26685"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
     const btn = document.getElementById('spin-btn');
@@ -137,6 +163,7 @@
     const statusBar = document.getElementById('status-bar');
     const turDisplay = document.getElementById('tur-display');
 
+    let playerName = "";
     let gameMode = 'single';
     let maxTur = 1;
     let playerCount = 1;
@@ -146,9 +173,68 @@
     let spinning = false;
     let items = ["İFLAS", "PAS", "PAS", "1", "10", "50", "100", "200", "350", "500", "1000", "5000"];
 
-    // Dünya Skoru Kaydı (LocalStorage)
-    let worldTotal = parseInt(localStorage.getItem('wheelWorldScore')) || 0;
+    function startGame() {
+        const input = document.getElementById('player-name-input').value.trim().toUpperCase();
+        if (input.length < 2) {
+            alert("Lütfen geçerli bir isim girin!");
+            return;
+        }
+        playerName = input;
+        document.getElementById('login-screen').style.display = 'none';
+        resetGame();
+    }
 
+    async function updateFirebaseScore(finalScore) {
+        if (gameMode !== 'single') return; // Sadece bireysel skorları kaydediyoruz
+        const userRef = database.ref('career_players/' + playerName);
+        const snapshot = await userRef.once('value');
+        let currentTotal = 0;
+        if (snapshot.exists()) {
+            currentTotal = snapshot.val().totalScore || 0;
+        }
+        userRef.set({
+            totalScore: currentTotal + finalScore,
+            lastUpdate: Date.now()
+        });
+    }
+
+function showWorldScore() {
+        const screen = document.getElementById('world-screen');
+        const stats = document.getElementById('world-stats');
+        stats.innerHTML = "Bağlanıyor...";
+        screen.style.display = 'flex';
+
+        database.ref('career_players').orderByChild('totalScore').limitToLast(5)
+            .once('value')
+            .then((snapshot) => {
+                if (!snapshot.exists()) {
+                    stats.innerHTML = "Henüz kayıtlı skor yok!";
+                    return;
+                }
+                let players = [];
+                snapshot.forEach((child) => {
+                    // Güvenlik: Eğer totalScore yoksa 0 kabul et
+                    const data = child.val();
+                    const scoreVal = (data && data.totalScore) ? data.totalScore : 0;
+                    players.push({ name: child.key, score: scoreVal });
+                });
+                
+                // Büyükten küçüğe sırala
+                players.sort((a, b) => b.score - a.score);
+
+                let html = "";
+                players.forEach((p, i) => {
+                    // Sayı formatlama işlemini güvenli yapıyoruz
+                    const formattedScore = Number(p.score).toLocaleString('tr-TR');
+                    html += `<div class="table-row"><span>${i + 1}. ${p.name}</span><span>${formattedScore}</span></div>`;
+                });
+                stats.innerHTML = html;
+            })
+            .catch((error) => {
+                console.error("Firebase Hatası:", error);
+                stats.innerHTML = "Bağlantı Hatası: " + error.message;
+            });
+    }    // Oyun Mantığı Fonksiyonları (Orijinal kod korunarak)
     function changeTur(val) {
         if(spinning) return;
         maxTur = Math.max(1, Math.min(10, maxTur + val));
@@ -172,21 +258,6 @@
         resetGame();
     }
 
-    function showWorldScore() {
-        const screen = document.getElementById('world-screen');
-        const stats = document.getElementById('world-stats');
-        stats.innerHTML = `
-            <div class="table-row" style="color:#fbc02d"><span>SENİN SKORUN:</span><span>${worldTotal}</span></div>
-            <div style="height:10px"></div>
-            <div class="table-row"><span>1. King_Wheel</span><span>950.000</span></div>
-            <div class="table-row"><span>2. Master_Spin</span><span>720.500</span></div>
-            <div class="table-row"><span>3. LuckyDay</span><span>500.000</span></div>
-            <div class="table-row"><span>4. ProPlayer</span><span>310.000</span></div>
-            <div class="table-row"><span>5. Star_77</span><span>150.000</span></div>
-        `;
-        screen.style.display = 'flex';
-    }
-
     function resetGame() {
         currentPlayer = 1; currentSpins = 0;
         playerScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -199,7 +270,7 @@
     }
 
     function updateStatus() {
-        if(gameMode === 'single') statusBar.innerText = `Bireysel Mod | Hak: ${maxTur - currentSpins}/${maxTur}`;
+        if(gameMode === 'single') statusBar.innerText = `${playerName} | Hak: ${maxTur - currentSpins}/${maxTur}`;
         else statusBar.innerText = `Oyuncu ${currentPlayer} | Hak: ${maxTur - currentSpins}/${maxTur}`;
     }
 
@@ -253,7 +324,7 @@
         items.sort(() => Math.random() - 0.5);
         draw();
 
-        const duration = 7000 + Math.random() * 3000;
+        const duration = 5000 + Math.random() * 2000;
         const extraSpins = (10 + Math.random() * 5) * 360;
         const startTime = performance.now();
         let lastTickAngle = 0;
@@ -265,7 +336,7 @@
             const currentAngle = currentRotation + (extraSpins * easing);
             canvas.style.transform = `rotate(${currentAngle % 360}deg)`;
 
-            if (progress > 0.5 && Math.abs(currentAngle - lastTickAngle) >= (360/items.length)) {
+            if (Math.abs(currentAngle - lastTickAngle) >= (360/items.length)) {
                 playTick(); lastTickAngle = currentAngle;
                 document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(-15deg)";
                 setTimeout(() => document.getElementById('pointer-ui').style.transform = "translateX(-50%) rotate(0deg)", 50);
@@ -301,22 +372,17 @@
                 }, 1500);
             } else { 
                 setTimeout(() => { 
-                    // Tur bitiminde Dünya Skoru'na ekleme yap
+                    // Firebase'e sadece bireysel modda toplam skoru kaydet
                     if(gameMode === 'single') {
-                        worldTotal += playerScores[1];
-                        localStorage.setItem('wheelWorldScore', worldTotal);
-                    } else {
-                        // Çoklu modda tüm oyuncuların toplamını ekle (İsteğe göre değişebilir)
-                        for(let i=1; i<=playerCount; i++) worldTotal += playerScores[i];
-                        localStorage.setItem('wheelWorldScore', worldTotal);
+                        updateFirebaseScore(playerScores[1]);
                     }
 
                     document.getElementById('final-screen').style.display = "flex"; 
                     let s=""; 
                     for(let i=1; i<=(gameMode==='single'?1:playerCount); i++) {
-                        s+=`<div class='table-row'><span>Oyuncu ${i}:</span><span>${playerScores[i]} Puan</span></div>`;
+                        s+=`<div class='table-row'><span>${gameMode==='single'?playerName:('Oyuncu '+i)}:</span><span>${playerScores[i]} Puan</span></div>`;
                     }
-                    s += `<div style="height:10px"></div><div class='table-row' style='color:#fbc02d'><span>DÜNYA SKORUNA EKLENDİ!</span></div>`;
+                    s += `<div style="height:10px"></div><div class='table-row' style='color:#fbc02d'><span>DÜNYA SKORU GÜNCELLENDİ!</span></div>`;
                     document.getElementById('final-stats').innerHTML=s; 
                 }, 1500); 
             }
